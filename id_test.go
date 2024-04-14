@@ -7,7 +7,7 @@ import (
 )
 
 func TestID_Generate_duplicate(t *testing.T) {
-	ll := 10000000
+	ll := 20000000
 	idArr := make(map[int64]struct{}, ll)
 	idChan := make(chan int64, ll)
 	i := 0
@@ -40,7 +40,7 @@ func TestID_Generate_duplicate(t *testing.T) {
 }
 
 func TestID_Generate_increment(t *testing.T) {
-	ll := 10000000
+	ll := 20000000
 	var latestID int64
 	id := NewID()
 	for i := 0; i < ll; i++ {
