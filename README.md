@@ -15,9 +15,9 @@ id generator, which generates globally unique id
 
 # 采用三段设计：
 
-第一段长度 32~43 位，存放（毫）秒级时间戳 <br/>
-第二段长度 0~20 位，存放机器码<br/>
-第三段长度 2~21 位，存放计数器（递增）
+第一段长度 32 ~ 43 位，存放（毫）秒级时间戳 <br>
+第二段长度 0 ~ 20 位，存放机器码 <br>
+第三段长度 2 ~ 21 位，存放计数器（递增）
 
 ![](D:\project\go\github.com\ace-zhaoy\go-id\images\id.png)
 
