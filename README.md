@@ -19,7 +19,7 @@ id generator, which generates globally unique id
 第二段长度 0 ~ 20 位，存放机器码 <br>
 第三段长度 2 ~ 21 位，存放计数器（递增）
 
-![](D:\project\go\github.com\ace-zhaoy\go-id\images\id.png)
+![](./images/id.png)
 
 
 | 名称  | 方案                      | 最大支持时间              | 极限速度（N=0）     | 说明                        |
