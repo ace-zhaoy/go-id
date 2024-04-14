@@ -29,7 +29,7 @@ id generator, which generates globally unique id
 | ID3 | Millisecond 42+N+(11-N) | 2109-05-15 15:35:11 | 2,048 / ms    | N = 0 OR (N >1 AND N <10) |
 | ID3 | Millisecond 43+N+(10-N) | 2248-09-26 23:10:22 | 1,024 / ms    | N = 0 OR (N >1 AND N <9)  |
 
-> N 表示节点占用位长度，可为 0 （适合单机的时候使用）
+> N 表示节点占用位长度，可为 0 （适合单机使用）
 
 
 # 使用
