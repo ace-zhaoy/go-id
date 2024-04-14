@@ -17,8 +17,8 @@ func TestID_Generate_duplicate(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		for {
-			id := <-idChan
-			idArr[id] = struct{}{}
+			idV := <-idChan
+			idArr[idV] = struct{}{}
 			i++
 			if i == ll {
 				break
@@ -26,7 +26,7 @@ func TestID_Generate_duplicate(t *testing.T) {
 		}
 	}()
 	tt := time.Now()
-	for i := 0; i < ll; i++ {
+	for j := 0; j < ll; j++ {
 		go func() {
 			defer wg.Done()
 			idChan <- id.Generate()
@@ -44,12 +44,45 @@ func TestID_Generate_increment(t *testing.T) {
 	var latestID int64
 	id := NewID()
 	for i := 0; i < ll; i++ {
-		id1 := id.Generate()
-		if id1 > latestID {
-			latestID = id1
+		idV := id.Generate()
+		if idV > latestID {
+			latestID = idV
 			continue
 		}
-		t.Errorf("id (%d) <= latestID (%d) ", id1, latestID)
+		t.Errorf("id (%d) <= latestID (%d) ", idV, latestID)
 	}
 
+}
+
+func TestID_SetDelta(t *testing.T) {
+	id := NewID()
+	delta := uint32(1 << 10)
+	id.SetDelta(delta)
+	var lt int64
+	var lc uint32
+	// 预计耗时 48s 左右
+	for i := 0; i < 100000; i++ {
+		idV := id.Generate()
+		idt, idc := ResolveID(idV, id)
+		if lt < idt {
+			if lt != 0 && idt != lt+1 {
+				t.Errorf("idt (%d) != lt+1 (%d)", idt, lt+1)
+				break
+			}
+			if idc > delta {
+				t.Errorf("idc (%d) > delta (%d)", idc, delta)
+				break
+			}
+			lt = idt
+		} else if lt == idt {
+			if idc-lc > delta {
+				t.Errorf("idc-lc (%d) > delta (%d)", idc-lc, delta)
+				break
+			}
+		} else {
+			t.Errorf("idt (%d) < lt (%d)", idt, lt)
+			break
+		}
+		lc = idc
+	}
 }

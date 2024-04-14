@@ -23,10 +23,16 @@ func GenID() int64 {
 	return _id.Generate()
 }
 
+func ResolveID(id int64, oid *ID) (timestamp int64, counter uint32) {
+	return id >> 21, uint32(id) & uint32((1<<(21-oid.nodeBits))-1)
+}
+
 type ID struct {
 	id          int64
-	randomDelta uint32
 	delta       uint32
+	randomDelta uint32
+	node        uint32
+	nodeBits    uint8
 }
 
 func (i *ID) Generate() int64 {
@@ -34,14 +40,16 @@ func (i *ID) Generate() int64 {
 		old := atomic.LoadInt64(&i.id)
 		nt := uint32(time.Now().Unix())
 		lt := uint32(old >> 21)
-		ct := uint32(old) & 0x1FFFFF
+		cBits := 21 - i.nodeBits
+		mask := uint32((1 << cBits) - 1)
+		ct := uint32(old) & mask
 		if nt < lt {
 			time.Sleep(time.Millisecond)
 			continue
 		}
 		if nt == lt {
 			ct += i.getDelta()
-			if ct >= 0x1FFFFF {
+			if ct > mask {
 				time.Sleep(time.Millisecond)
 				continue
 			}
@@ -49,7 +57,10 @@ func (i *ID) Generate() int64 {
 			ct = 1
 		}
 
-		now := (int64(nt) << 21) | (int64(ct))
+		now := (int64(nt) << 21) | int64(ct)
+		if i.nodeBits > 0 {
+			now |= int64(i.node) << cBits
+		}
 		if atomic.CompareAndSwapInt64(&i.id, old, now) {
 			return now
 		}
@@ -66,7 +77,7 @@ func (i *ID) getDelta() uint32 {
 }
 
 func (i *ID) SetDelta(d uint32) {
-	if d == 0 || d >= 0x1FFFFF {
+	if d == 0 || d >= (1<<(21-i.nodeBits)-1) {
 		panic("delta too large or invalid")
 	}
 	i.delta = d
@@ -77,7 +88,7 @@ func (i *ID) GetDelta() uint32 {
 }
 
 func (i *ID) SetRandomDelta(r uint32) {
-	if r == 0 || r >= 0x1FFFFF {
+	if r == 0 || r >= (1<<(21-i.nodeBits)-1) {
 		panic("random delta too large or invalid")
 	}
 	i.randomDelta = r
@@ -85,4 +96,18 @@ func (i *ID) SetRandomDelta(r uint32) {
 
 func (i *ID) GetRandomDelta() uint32 {
 	return i.randomDelta
+}
+
+func (i *ID) SetNode(node uint32, nodeBits uint8) {
+	if nodeBits < 2 || nodeBits > 19 ||
+		node == 0 || node > (1<<nodeBits-1) ||
+		i.delta >= (1<<(21-nodeBits)-1) ||
+		i.randomDelta >= (1<<(21-nodeBits)-1) {
+		panic("node or nodeBits is invalid")
+	}
+	i.node, i.nodeBits = node, nodeBits
+}
+
+func (i *ID) GetNode() (node uint32, nodeBits uint8) {
+	return i.node, i.nodeBits
 }
