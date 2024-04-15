@@ -1,6 +1,6 @@
 # go-id
 
-id generator, which generates globally unique id
+id generator, which generates globally unique id, mini Snowflake
 
 # 特性
 
