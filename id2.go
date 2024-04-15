@@ -50,7 +50,7 @@ func (i *ID2) Generate() int64 {
 		if nt == lt {
 			ct += i.getDelta()
 			if ct > mask {
-				time.Sleep(10 * time.Millisecond)
+				time.Sleep(time.Millisecond)
 				continue
 			}
 		} else {
