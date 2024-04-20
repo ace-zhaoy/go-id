@@ -56,11 +56,10 @@ func TestID_Generate_increment(t *testing.T) {
 
 func TestID_SetDelta(t *testing.T) {
 	id := NewID()
-	delta := uint32(1 << 10)
+	delta := uint32(1 << 6)
 	id.SetDelta(delta)
 	var lt int64
 	var lc uint32
-	// 预计耗时 48s 左右
 	for i := 0; i < 100000; i++ {
 		idV := id.Generate()
 		idt, idc := ResolveID(idV, id)

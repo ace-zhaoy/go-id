@@ -2,6 +2,7 @@ package goid
 
 import (
 	"crypto/rand"
+	"github.com/beevik/ntp"
 	"math/big"
 	"sync/atomic"
 	"time"
@@ -9,7 +10,8 @@ import (
 
 func NewID2() *ID2 {
 	return &ID2{
-		delta: 1,
+		delta:            1,
+		maxBacktrackWait: 3 * time.Second,
 	}
 }
 
@@ -28,11 +30,13 @@ func ResolveID2(id int64, oid *ID2) (timestamp int64, counter uint32) {
 }
 
 type ID2 struct {
-	id          int64
-	delta       uint32
-	randomDelta uint32
-	node        uint32
-	nodeBits    uint8
+	id               int64
+	delta            uint32
+	randomDelta      uint32
+	node             uint32
+	nodeBits         uint8
+	maxBacktrackWait time.Duration
+	ntpServer        string
 }
 
 func (i *ID2) Generate() int64 {
@@ -44,8 +48,18 @@ func (i *ID2) Generate() int64 {
 		mask := uint32((1 << cBits) - 1)
 		ct := uint32(old) & mask
 		if nt < lt {
-			time.Sleep(time.Millisecond)
-			continue
+			if time.Duration(lt-nt)*time.Second <= i.maxBacktrackWait {
+				time.Sleep(time.Millisecond)
+				continue
+			}
+			if i.ntpServer == "" {
+				panic("ntp server not set")
+			}
+			ntTime, err := ntp.Time(i.ntpServer)
+			if err != nil {
+				panic(err)
+			}
+			nt = ntTime.Unix()
 		}
 		if nt == lt {
 			ct += i.getDelta()
@@ -110,4 +124,16 @@ func (i *ID2) SetNode(node uint32, nodeBits uint8) {
 
 func (i *ID2) GetNode() (node uint32, nodeBits uint8) {
 	return i.node, i.nodeBits
+}
+
+func (i *ID2) SetMaxBacktrackWait(d time.Duration) {
+	i.maxBacktrackWait = d
+}
+
+func (i *ID2) GetMaxBacktrackWait() time.Duration {
+	return i.maxBacktrackWait
+}
+
+func (i *ID2) SetNTPServer(s string) {
+	i.ntpServer = s
 }
