@@ -10,7 +10,7 @@ id generator, which generates globally unique id, mini Snowflake
 4. 采用53位整型，支持 json 整型传输解析，不会超限导致解析错误（虽然有部分库已经支持bigint，但需要手动配置，so，不超过53位就无任何顾虑）
 5. 采用无锁技术，生成速度极快，每秒可生成两百多万不重复且递增的ID（受53位长度限制）
 6. 每（毫）秒生成超限会等待直至下一（毫）秒，计数器会重置从 1 开始重新计数
-7. 服务器时钟回拨也不会生成重复ID（支持等待及获取网络时间）
+7. 服务器***时钟回拨***也不会生成重复ID（支持等待及获取网络时间，默认 3s）
 8. 使用简单（单机使用无需任何配置，分布式使用，设置节点即可）
 
 # 采用三段设计：
@@ -56,9 +56,9 @@ goid.GetID().SetNode(1, 10)
 goid.GetID().SetDelta(1024)
 ```
 
-#### 设置随机增量（强烈建议设置该选项，范围不宜太大）
+#### 设置随机增量
 ```go
-// id末尾的序列号每次在 1 ~ 1024 之间随机增加
+// id末尾的序列号每次在 1 ~ 1024 之间随机增加，范围不宜太大
 goid.GetID().SetRandomDelta(1024)
 ```
 > 在机器不多的情况下，可以设置随机增量来避免多机器ID重复
@@ -68,4 +68,10 @@ goid.GetID().SetRandomDelta(1024)
 // 保存好变量
 myID := goid.NewID()
 id := myID.Generate()
+```
+
+#### 设置服务器时钟回拨最大等待时间及 NTP Server
+```go
+goid.GetID().SetMaxBacktrackWait(10 * time.Second)
+goid.GetID().SetNTPServer("pool.ntp.org")
 ```

@@ -120,3 +120,30 @@ func TestID_SetRandomDelta(t *testing.T) {
 		lc = idc
 	}
 }
+
+func TestID_SetNode(t *testing.T) {
+	id := NewID()
+	id.SetNode(2, 4)
+	var lt int64
+	var lc uint32
+	node, nodeBits := id.GetNode()
+	for i := 0; i < 100000; i++ {
+		idV := id.Generate()
+		nlt := idV >> 21
+		nlc := uint32(idV) & uint32((1<<(21-nodeBits))-1)
+		nnode := uint32(idV>>(21-nodeBits)) & uint32((1<<nodeBits)-1)
+
+		if lt > nlt {
+			t.Errorf("nlt (%d) < lt (%d)", nlt, lt)
+			break
+		}
+		if lt == nlt && lc > nlc {
+			t.Errorf("nlc (%d) < lc (%d)", nlc, lc)
+			break
+		}
+		if node != nnode {
+			t.Errorf("node (%d) != nnode (%d)", node, nnode)
+		}
+		lt, lc = nlt, nlc
+	}
+}
