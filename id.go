@@ -60,6 +60,9 @@ func (i *ID) Generate() int64 {
 				panic(err)
 			}
 			nt = uint32(ntTime.Unix())
+			if nt < lt {
+				panic("ntp time error")
+			}
 		}
 		if nt == lt {
 			ct += i.getDelta()
