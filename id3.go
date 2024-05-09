@@ -101,7 +101,7 @@ func (i *ID3) GetRandomDelta() uint16 {
 
 func (i *ID3) SetNode(node uint16, nodeBits uint8) {
 	if nodeBits < 2 || nodeBits > (MaxBits-i.bits-2) ||
-		node == 0 || node > (1<<nodeBits-1) ||
+		node > (1<<nodeBits-1) ||
 		i.delta >= (1<<(MaxBits-i.bits-nodeBits)-1) ||
 		i.randomDelta >= (1<<(MaxBits-i.bits-nodeBits)-1) {
 		panic("node or nodeBits is invalid")
