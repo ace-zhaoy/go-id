@@ -87,7 +87,7 @@ func (i *ID2) Generate() int64 {
 func (i *ID2) getDelta() uint32 {
 	if i.randomDelta > 0 {
 		if de, err := rand.Int(rand.Reader, big.NewInt(int64(i.randomDelta))); err == nil {
-			return uint32(de.Int64())
+			return uint32(de.Int64() + 1)
 		}
 	}
 	return i.delta
