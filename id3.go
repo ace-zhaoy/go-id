@@ -13,14 +13,14 @@ const (
 )
 
 type ID3 struct {
+	ntpServer        string
 	id               int64
-	delta            uint16
+	maxBacktrackWait time.Duration
 	randomDelta      uint16
 	node             uint16
+	delta            uint16
 	nodeBits         uint8
 	bits             uint8
-	maxBacktrackWait time.Duration
-	ntpServer        string
 }
 
 func (i *ID3) Generate() int64 {

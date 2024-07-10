@@ -85,8 +85,8 @@ func TestGenerateMachineCode(t *testing.T) {
 	}
 	tests := []struct {
 		name     string
-		args     args
 		wantCode int
+		args     args
 		wantErr  bool
 	}{
 		{

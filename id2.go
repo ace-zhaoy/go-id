@@ -30,13 +30,13 @@ func ResolveID2(id int64, oid *ID2) (timestamp int64, counter uint32) {
 }
 
 type ID2 struct {
+	ntpServer        string
+	maxBacktrackWait time.Duration
 	id               int64
 	delta            uint32
 	randomDelta      uint32
 	node             uint32
 	nodeBits         uint8
-	maxBacktrackWait time.Duration
-	ntpServer        string
 }
 
 func (i *ID2) Generate() int64 {
