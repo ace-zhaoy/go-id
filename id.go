@@ -30,9 +30,9 @@ func ResolveID(id int64, oid *ID) (timestamp int64, counter uint32) {
 }
 
 type ID struct {
-	ntpServer        string
+	id               int64 // hot path
 	maxBacktrackWait time.Duration
-	id               int64
+	ntpServer        string
 	delta            uint32
 	randomDelta      uint32
 	node             uint32

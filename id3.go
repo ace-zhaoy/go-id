@@ -13,9 +13,9 @@ const (
 )
 
 type ID3 struct {
-	ntpServer        string
 	id               int64
 	maxBacktrackWait time.Duration
+	ntpServer        string
 	randomDelta      uint16
 	node             uint16
 	delta            uint16
